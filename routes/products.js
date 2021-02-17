@@ -1,6 +1,7 @@
 const express = require("express");
 const controller = require("../controllers/products");
 const router = express.Router();
+const upload = require("../middleware/multer");
 
 router.param("productId", async (req, res, next, productId) => {
   const productFound = await controller.fetchProduct(productId, next);
@@ -14,10 +15,12 @@ router.param("productId", async (req, res, next, productId) => {
   }
 });
 
+// single: uploading one image only
+// "image": the name of the model field where we want to save the image
+
 router.get("/", controller.productList);
-router.post("/", controller.productCreate);
 router.get("/:productId", controller.productDetail);
-router.put("/:productId", controller.productUpdate);
+router.put("/:productId", upload.single("image"), controller.productUpdate);
 router.delete("/:productId", controller.productDelete);
 
 module.exports = router;
