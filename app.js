@@ -1,16 +1,27 @@
 const express = require("express");
+const passport = require("passport");
 const db = require("./db/models");
+
 const productRoutes = require("./routes/products");
 const shopRoutes = require("./routes/shops");
+const userRoutes = require("./routes/users");
+const { localStrategy } = require("./middleware/passport");
 const cors = require("cors");
 const app = express();
 const path = require("path");
 
+// Middleware
 app.use(express.json());
 app.use(cors());
 
+// Passport
+app.use(passport.initialize());
+passport.use(localStrategy);
+
+// Routes
 app.use("/products", productRoutes);
 app.use("/shops", shopRoutes);
+app.use(userRoutes);
 app.use("/media", express.static(path.join(__dirname, "media")));
 
 app.use((req, res, next) => {
@@ -25,7 +36,7 @@ app.use((err, req, res, next) => {
 });
 
 const PORT = 8001;
-db.sequelize.sync({ alter: true });
+db.sequelize.sync();
 app.listen(PORT, () => {
   console.log(`Running on port ${PORT}`);
 });
