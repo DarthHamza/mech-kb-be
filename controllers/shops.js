@@ -30,6 +30,7 @@ exports.shopCreate = async (req, res, next) => {
   try {
     if (req.file)
       req.body.image = `http://${req.get("host")}/media/${req.file.filename}`;
+    req.body.userId = req.user.id; // req.user is coming from jwt strategy
     const newShop = await Shop.create(req.body);
     res.status(201).json(newShop);
   } catch (error) {
@@ -56,12 +57,19 @@ exports.shopDelete = async (req, res, next) => {
 
 exports.productCreate = async (req, res, next) => {
   try {
-    // coming from route params middleware
-    req.body.ShopId = req.shop.id;
-    if (req.file)
-      req.body.image = `http://${req.get("host")}/media/${req.file.filename}`;
-    const newProduct = await Product.create(req.body);
-    res.status(201).json(newProduct);
+    if (req.user.id === req.shop.userId) {
+      // coming from route params middleware
+      req.body.shopId = req.shop.id;
+      if (req.file)
+        req.body.image = `http://${req.get("host")}/media/${req.file.filename}`;
+      const newProduct = await Product.create(req.body);
+      res.status(201).json(newProduct);
+    } else {
+      next({
+        status: 401,
+        message: "Don't you dare create a product in ma shop!!!",
+      });
+    }
   } catch (error) {
     next(error);
   }
