@@ -1,4 +1,5 @@
 const express = require("express");
+const passport = require("passport");
 const controller = require("../controllers/shops");
 const router = express.Router();
 const upload = require("../middleware/multer");
@@ -17,6 +18,7 @@ router.param("shopId", async (req, res, next, shopId) => {
 
 // single: uploading one image only
 // "image": the name of the model field where we want to save the image
+router.use(passport.authenticate("jwt", { session: false }));
 
 router.get("/", controller.shopList);
 router.post("/", upload.single("image"), controller.shopCreate);

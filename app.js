@@ -5,7 +5,7 @@ const db = require("./db/models");
 const productRoutes = require("./routes/products");
 const shopRoutes = require("./routes/shops");
 const userRoutes = require("./routes/users");
-const { localStrategy } = require("./middleware/passport");
+const { localStrategy, jwtStrategy } = require("./middleware/passport");
 const cors = require("cors");
 const app = express();
 const path = require("path");
@@ -17,6 +17,7 @@ app.use(cors());
 // Passport
 app.use(passport.initialize());
 passport.use(localStrategy);
+passport.use(jwtStrategy);
 
 // Routes
 app.use("/products", productRoutes);
